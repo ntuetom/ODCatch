@@ -23,13 +23,22 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 	
-	ListView videoList;
-	ArrayAdapter<String> videoAdapter;
+	private ListView dataList;
+	private Spinner spinner;
+	private String[] selectitem ={"地址","項目","日期","標題","人數"};
+	
+	ArrayAdapter<String> dataAdapter;
+	ArrayAdapter<String> selectAdapter;
 	ArrayList<String> videoArrayList = new ArrayList<String>();
 	Context context;
 	String feedUrl ="http://data.taipei.gov.tw/opendata/apply/json/QjI5MURDOTgtOUU3OC00RTlELUE1MTAtRTIwMUVGNzNEN0Q3";
@@ -38,15 +47,31 @@ public class MainActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);	
-		videoList =(ListView)findViewById(R.id.ListV1);
+		dataList = (ListView)findViewById(R.id.listView1);
+		spinner = (Spinner)findViewById(R.id.spinner1);
+		
 		context = this;		
-		videoAdapter = new ArrayAdapter<String>(this,R.layout.video_list_item,videoArrayList);
-		videoList.setAdapter(videoAdapter);
+		dataAdapter = new ArrayAdapter<String>(this,R.layout.video_list_item,videoArrayList);
+		dataList.setAdapter(dataAdapter);
+		selectAdapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item,selectitem);
+		spinner.setAdapter(selectAdapter);
+		
+		spinner.setOnItemSelectedListener(new OnItemSelectedListener(){
+			@Override
+			public void onItemSelected(AdapterView<?>arg0,View arg1,int pos,long arg3){
+				Toast.makeText(context.getApplicationContext(), "你選的是"+selectitem[pos], Toast.LENGTH_SHORT).show();
+			}
+			@Override
+		    public void onNothingSelected(AdapterView<?> arg0) {
+	
+		    }
+		});
 		
 		VideoListTask loaderTask = new VideoListTask();
 		loaderTask.execute();
 	}
-
+	
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -72,7 +97,7 @@ public class MainActivity extends ActionBarActivity {
 		@Override
 		protected void onPostExecute(Void result) {
 			dialog.dismiss();
-			videoAdapter.notifyDataSetChanged();
+			dataAdapter.notifyDataSetChanged();
 			super.onPostExecute(result);
 		}
 
