@@ -32,14 +32,15 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
-	
+	private VideoListTask loaderTask;
 	private ListView dataList;
 	private Spinner spinner;
-	private String[] selectitem ={"地址","項目","日期","標題","人數"};
-	
+	private String[] selectitem = {"目錄","名稱","圖片","更多資訊","地理座標"};
+	private String[] selcttitle = {"E_Category","E_Name","E_Pic_URL","E_Info","E_Geo"};
 	ArrayAdapter<String> dataAdapter;
 	ArrayAdapter<String> selectAdapter;
-	ArrayList<String> videoArrayList = new ArrayList<String>();
+	ArrayList<String> dataArrayList = new ArrayList<String>();
+	ArrayList<String> selectArrayList = new ArrayList<String>();
 	Context context;
 	String feedUrl ="http://data.taipei.gov.tw/opendata/apply/json/QjI5MURDOTgtOUU3OC00RTlELUE1MTAtRTIwMUVGNzNEN0Q3";
 	
@@ -51,24 +52,31 @@ public class MainActivity extends ActionBarActivity {
 		spinner = (Spinner)findViewById(R.id.spinner1);
 		
 		context = this;		
-		dataAdapter = new ArrayAdapter<String>(this,R.layout.video_list_item,videoArrayList);
+		dataAdapter = new ArrayAdapter<String>(this,R.layout.video_list_item,dataArrayList);
 		dataList.setAdapter(dataAdapter);
 		selectAdapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item,selectitem);
 		spinner.setAdapter(selectAdapter);
+		
+		loaderTask = new VideoListTask(0);
+		loaderTask.execute();
 		
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener(){
 			@Override
 			public void onItemSelected(AdapterView<?>arg0,View arg1,int pos,long arg3){
 				Toast.makeText(context.getApplicationContext(), "你選的是"+selectitem[pos], Toast.LENGTH_SHORT).show();
+				dataArrayList.clear();
+				loaderTask = new VideoListTask(pos);
+				loaderTask.execute();
 			}
 			@Override
 		    public void onNothingSelected(AdapterView<?> arg0) {
 	
 		    }
 		});
+		for(int i=0;i<selectitem.length;i++){
+			selectArrayList.add(selcttitle[i]);
+		}
 		
-		VideoListTask loaderTask = new VideoListTask();
-		loaderTask.execute();
 	}
 	
 	
@@ -92,8 +100,12 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	private class VideoListTask extends AsyncTask<Void,Void,Void>{
-
+		int ipara;
 		ProgressDialog dialog;
+		public VideoListTask(int pos) {
+			ipara = pos;
+		}
+
 		@Override
 		protected void onPostExecute(Void result) {
 			dialog.dismiss();
@@ -133,10 +145,10 @@ public class MainActivity extends ActionBarActivity {
 				 String jsonData = builder.toString();
 				 
 				 JSONArray jsonArray = new JSONArray(jsonData);
-				 
+		
 				 for(int i = 0;i<jsonArray.length();i++){
 					 JSONObject jsonObj = jsonArray.getJSONObject(i);
-					 videoArrayList.add(jsonObj.getString("E_Name"));
+					 dataArrayList.add(jsonObj.getString(selcttitle[ipara]));
 				 }
 				 
 				 
