@@ -64,9 +64,9 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public void onItemSelected(AdapterView<?>arg0,View arg1,int pos,long arg3){
 				Toast.makeText(context.getApplicationContext(), "你選的是"+selectitem[pos], Toast.LENGTH_SHORT).show();
-				dataArrayList.clear();
 				loaderTask = new VideoListTask(pos);
 				loaderTask.execute();
+				dataArrayList.clear();
 			}
 			@Override
 		    public void onNothingSelected(AdapterView<?> arg0) {
